@@ -1,0 +1,82 @@
+{
+  "fixture": "python-langchain-llm-threat-fixture",
+  "signals": [
+    {
+      "id": "LLM-PROMPT-001",
+      "title": "LangChain prompt mixes retrieved context and user input without instruction hierarchy controls",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "app/main.py uses PromptTemplate.from_template with raw retrievedContext and prompt",
+        "app/static/app.js sends prompt injection text in retrievedContext"
+      ],
+      "groups": [
+        ["prompt injection", "instruction hierarchy", "retrieved context"],
+        ["LangChain", "PromptTemplate", "raw prompt"],
+        ["ignore previous instructions", "system prompt", "tool calls"]
+      ]
+    },
+    {
+      "id": "LLM-TOOL-001",
+      "title": "Caller-controlled tool routing allows SSRF, file reads, and Python code execution",
+      "priority": "P1",
+      "groups": [
+        ["tool", "tool routing", "function calling"],
+        ["requests_get", "python_exec", "file_read"],
+        ["SSRF", "exec", "arbitrary code", "local file"]
+      ]
+    },
+    {
+      "id": "LLM-AUTHZ-001",
+      "title": "LLM chat, memory, and replay endpoints have missing or insufficient authorization",
+      "priority": "P1",
+      "groups": [
+        ["authorization", "access control", "authz", "tenant"],
+        ["tenantId", "userId", "memory", "supportOverride"],
+        ["missing", "insufficient", "weak prefix", "caller supplied"]
+      ]
+    },
+    {
+      "id": "LLM-SECRET-001",
+      "title": "LLM prompts, traces, and tool scopes expose API keys and sensitive context",
+      "priority": "P1-P2",
+      "groups": [
+        ["secret", "API key", "OPENAI_API_KEY"],
+        ["prompt", "trace", "renderedPrompt", "logging"],
+        ["sk-live", "inline", "tool scope"]
+      ]
+    },
+    {
+      "id": "LLM-CORS-001",
+      "title": "Credentialed preview-domain CORS and missing CSRF protection weaken the browser trust boundary",
+      "category": "design",
+      "priority": "P1-P2",
+      "groups": [
+        ["CORS", "cross-origin", "origin"],
+        ["CSRF", "csrf"],
+        ["allow_origin_regex", "preview.example", "partner.example", "allow_credentials", "credentialed"]
+      ]
+    },
+    {
+      "id": "LLM-SUPPLY-001",
+      "title": "LangChain dependencies are unpinned, installed without hashes, and lack SCA scanning",
+      "priority": "P2-P3",
+      "groups": [
+        ["SCA", "dependency", "supply chain"],
+        ["unpinned", "missing", "lacks", "not configured", "no hashes"],
+        ["langchain", "requirements.txt", "pip install", "pip install --upgrade", "GitHub Actions", "CI"]
+      ]
+    },
+    {
+      "id": "LLM-DEPLOY-001",
+      "title": "Deployment manifests run privileged workloads with inline LLM secrets",
+      "priority": "P1-P2",
+      "groups": [
+        ["Docker", "Kubernetes", "container"],
+        ["root", "privileged", "hostNetwork", "docker.sock"],
+        ["OPENAI_API_KEY", "secret", "environment", "inline"]
+      ]
+    }
+  ]
+}
+

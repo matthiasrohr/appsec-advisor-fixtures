@@ -1,0 +1,163 @@
+{
+  "fixture": "rust-threat-fixture",
+  "signals": [
+    {
+      "id": "RUST-OAUTH-001",
+      "title": "OAuth implicit grant returns bearer tokens to the browser fragment",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "src/main.rs accepts response_type=token",
+        "src/main.rs redirects with access_token in the fragment",
+        "static/app.js reads window.location.hash and stores the token"
+      ],
+      "groups": [
+        ["oauth"],
+        ["implicit", "response_type=token", "fragment"],
+        ["bearer", "access_token"]
+      ]
+    },
+    {
+      "id": "RUST-BFF-001",
+      "title": "Browser SPA stores bearer tokens in localStorage and calls APIs without a BFF",
+      "category": "design",
+      "priority": "P2",
+      "fixture_evidence": [
+        "docs/architecture.md records the missing backend-for-frontend boundary",
+        "static/app.js stores rustFixtureAccessToken in localStorage",
+        "static/app.js sends Bearer tokens directly to /api/profile/me"
+      ],
+      "groups": [
+        ["SPA", "browser", "single-page"],
+        ["localStorage"],
+        ["BFF", "backend-for-frontend", "direct API"]
+      ]
+    },
+    {
+      "id": "RUST-CORS-001",
+      "title": "Credentialed preview-domain CORS and missing CSRF protection weaken the browser trust boundary",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "src/main.rs configures tower-http CorsLayer with preview and partner origin predicates",
+        "src/main.rs enables allow_credentials(true)",
+        "Axum routes have no CSRF or authorization middleware"
+      ],
+      "groups": [
+        ["CORS", "cross-origin", "origin"],
+        ["CSRF", "csrf"],
+        ["AllowOrigin", "preview.example", "partner.example", "allow_credentials", "credentialed"]
+      ]
+    },
+    {
+      "id": "RUST-AUTH-001",
+      "title": "Password authentication logs plaintext credentials and issues weak demo tokens",
+      "priority": "P1-P2",
+      "groups": [
+        ["password"],
+        ["plaintext", "cleartext", "not hashed", "logged"],
+        ["Axum", "login", "src/main.rs"]
+      ]
+    },
+    {
+      "id": "RUST-JWT-001",
+      "title": "API authorization trusts unverified bearer token claims",
+      "priority": "P1",
+      "groups": [
+        ["JWT", "bearer", "token", "claims"],
+        ["unverified", "without verifying", "alg none", "signature"],
+        ["role", "subject", "sub"]
+      ]
+    },
+    {
+      "id": "RUST-BAC-001",
+      "title": "Profile, account, support export, and admin report APIs have missing or insufficient authorization",
+      "priority": "P1",
+      "groups": [
+        ["authorization", "access control", "authz", "IDOR"],
+        ["profile", "account", "admin-summary", "support-export", "supportOverride"],
+        ["missing", "bypass", "unauthenticated", "direct", "insufficient", "weak"]
+      ]
+    },
+    {
+      "id": "RUST-INJECT-001",
+      "title": "SQL statements are built by formatting request parameters",
+      "priority": "P1",
+      "groups": [
+        ["SQL injection", "SQLi", "string-built", "format!"],
+        ["login", "search", "owner"],
+        ["query", "SELECT", "concatenat"]
+      ]
+    },
+    {
+      "id": "RUST-NOSQL-001",
+      "title": "NoSQL document search passes raw MongoDB filters and $where clauses",
+      "priority": "P1",
+      "groups": [
+        ["NoSQL", "MongoDB", "document"],
+        ["rawFilter", "filter", "$where", "$regex"],
+        ["documents/search", "find", "mongoQuery"]
+      ]
+    },
+    {
+      "id": "RUST-WEBHOOK-001",
+      "title": "Unsigned payment webhook mutates balances",
+      "priority": "P1",
+      "groups": [
+        ["webhook", "payment"],
+        ["unsigned", "signature", "not verified", "missing verification"],
+        ["balance", "mutat", "amountCents"]
+      ]
+    },
+    {
+      "id": "RUST-SSRF-001",
+      "title": "Integration endpoint fetches user-controlled URLs",
+      "priority": "P1",
+      "groups": [
+        ["SSRF", "server-side request"],
+        ["fetch-preview", "reqwest", "user-controlled"],
+        ["arbitrary URL", "private network", "allowlist"]
+      ]
+    },
+    {
+      "id": "RUST-FILE-001",
+      "title": "File download allows path traversal through caller-controlled paths",
+      "priority": "P1-P2",
+      "groups": [
+        ["path traversal", "directory traversal"],
+        ["download", "tokio::fs"],
+        ["filename", "path", "join"]
+      ]
+    },
+    {
+      "id": "RUST-TOKEN-001",
+      "title": "Third-party provider tokens are stored and logged in plaintext",
+      "priority": "P1-P2",
+      "groups": [
+        ["third-party", "provider token", "tokenValue"],
+        ["plaintext", "cleartext", "unencrypted"],
+        ["sk_live", "logged", "provider_tokens"]
+      ]
+    },
+    {
+      "id": "RUST-DEPLOY-001",
+      "title": "Docker and Kubernetes manifests run privileged root workloads with inline secrets",
+      "priority": "P1-P2",
+      "groups": [
+        ["Docker", "Kubernetes", "container"],
+        ["root", "privileged", "hostNetwork", "docker.sock"],
+        ["secret", "token", "environment", "inline"]
+      ]
+    },
+    {
+      "id": "RUST-SUPPLY-001",
+      "title": "Cargo CI updates dependencies dynamically and lacks SCA scanning",
+      "priority": "P2-P3",
+      "groups": [
+        ["SCA", "dependency", "supply chain"],
+        ["missing", "lacks", "not configured", "cargo audit"],
+        ["cargo update", "Cargo.toml", "GitHub Actions", "CI"]
+      ]
+    }
+  ]
+}

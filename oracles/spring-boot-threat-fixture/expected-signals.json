@@ -1,0 +1,230 @@
+{
+  "fixture": "spring-boot-threat-fixture",
+  "signals": [
+    {
+      "id": "ACTUATOR-001",
+      "title": "Unauthenticated actuator exposure leaks internals and enables shutdown",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "src/main/resources/application.yml exposes all actuator endpoints and shows env/configprops values",
+        "src/main/java/com/example/threatfixture/config/SecurityConfig.java permits /actuator/**",
+        "src/main/java/com/example/threatfixture/actuator/InternalSecretsEndpoint.java returns internal secrets"
+      ],
+      "groups": [
+        ["actuator"],
+        ["env", "configprops", "internalSecrets", "shutdown"],
+        ["unauthenticated", "public", "permitAll", "exposed", "without authentication"],
+        ["secret", "password", "token", "credential", "shutdown"]
+      ]
+    },
+    {
+      "id": "AUTH-001",
+      "title": "Password authentication stores and compares plaintext passwords",
+      "priority": "P1-P2",
+      "groups": [
+        ["password"],
+        ["plaintext", "cleartext", "not hashed", "unsalted"],
+        ["DatabaseInitializer", "users", "AuthController"]
+      ]
+    },
+    {
+      "id": "AUTH-002",
+      "title": "OAuth implicit grant returns bearer tokens to the browser fragment",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "src/main/java/com/example/threatfixture/web/OAuthController.java accepts response_type=token",
+        "src/main/java/com/example/threatfixture/web/OAuthController.java redirects with access_token in the fragment",
+        "src/main/resources/static/oauth-callback.html reads window.location.hash and stores the token"
+      ],
+      "groups": [
+        ["oauth"],
+        ["implicit", "response_type=token", "fragment"],
+        ["bearer", "access_token"]
+      ]
+    },
+    {
+      "id": "SPA-001",
+      "title": "SPA stores bearer tokens in localStorage and calls APIs without a BFF",
+      "category": "design",
+      "priority": "P2",
+      "fixture_evidence": [
+        "docs/architecture.md lists the Browser SPA to Spring Boot API boundary without a backend-for-frontend boundary",
+        "src/main/resources/static/app.js stores walletFixtureAccessToken in localStorage",
+        "src/main/resources/static/app.js sends Bearer tokens directly to /api/profile/me and /api/reports/admin-summary"
+      ],
+      "groups": [
+        ["SPA", "single-page", "browser"],
+        ["localStorage"],
+        ["BFF", "backend-for-frontend", "direct API"]
+      ]
+    },
+    {
+      "id": "CORS-001",
+      "title": "Credentialed preview-domain CORS and disabled CSRF weaken the browser trust boundary",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "src/main/java/com/example/threatfixture/config/SecurityConfig.java disables CSRF",
+        "src/main/java/com/example/threatfixture/config/SecurityConfig.java allows preview and partner origin patterns with credentials",
+        "src/main/java/com/example/threatfixture/config/SecurityConfig.java permits /api/**, /actuator/**, and /h2-console/**"
+      ],
+      "groups": [
+        ["CORS", "cross-origin", "origin"],
+        ["CSRF", "csrf"],
+        ["preview.example", "partner.example", "allowedOriginPatterns", "allowCredentials", "credentialed"]
+      ]
+    },
+    {
+      "id": "BAC-001",
+      "title": "Profile, support export, and admin report APIs have missing or insufficient authorization",
+      "priority": "P1",
+      "groups": [
+        ["access control", "authorization", "authz", "IDOR"],
+        ["profile", "admin-summary", "support-export", "supportOverride"],
+        ["missing", "bypass", "unauthenticated", "insufficient", "weak"]
+      ]
+    },
+    {
+      "id": "BAC-002",
+      "title": "Protected routes trust unverified JWT claims and weak subject checks",
+      "priority": "P1",
+      "groups": [
+        ["JWT", "token", "claims"],
+        ["unverified", "without verifying", "signature"],
+        ["role", "subject", "sub"]
+      ]
+    },
+    {
+      "id": "INJECT-001",
+      "title": "SQL injection in login and account search",
+      "priority": "P1",
+      "groups": [
+        ["SQL injection", "string-built", "concatenat"],
+        ["login", "search"],
+        ["AuthController", "AccountController"]
+      ]
+    },
+    {
+      "id": "NOSQL-001",
+      "title": "NoSQL document search passes raw MongoDB filters and $where clauses",
+      "priority": "P1",
+      "groups": [
+        ["NoSQL", "MongoDB", "document"],
+        ["rawFilter", "filter", "$where", "$regex"],
+        ["documents/search", "find", "mongoQuery"]
+      ]
+    },
+    {
+      "id": "IDOR-001",
+      "title": "Account reads and updates are object-ID based without owner enforcement",
+      "priority": "P1-P2",
+      "groups": [
+        ["IDOR", "object", "account"],
+        ["owner", "viewer"],
+        ["read", "update", "email"]
+      ]
+    },
+    {
+      "id": "ADMIN-001",
+      "title": "Static admin bootstrap token controls settlement overrides",
+      "priority": "P1",
+      "groups": [
+        ["admin", "settlement", "override"],
+        ["static", "bootstrap", "hardcoded"],
+        ["token", "X-Admin-Token"]
+      ]
+    },
+    {
+      "id": "WEBHOOK-001",
+      "title": "Unsigned payment webhook mutates balances",
+      "priority": "P1",
+      "groups": [
+        ["webhook", "payment"],
+        ["unsigned", "signature", "not verified", "missing verification"],
+        ["balance", "mutat", "tamper"]
+      ]
+    },
+    {
+      "id": "SSRF-001",
+      "title": "Integration endpoints fetch or post to user-controlled URLs",
+      "priority": "P1",
+      "groups": [
+        ["SSRF", "server-side request"],
+        ["fetch-preview", "notify-partner", "callback"],
+        ["user-controlled", "arbitrary URL", "private network", "allowlist"]
+      ]
+    },
+    {
+      "id": "FILE-001",
+      "title": "File upload and download permit traversal or unrestricted file handling",
+      "priority": "P1-P2",
+      "groups": [
+        ["path traversal", "directory traversal", "unrestricted upload"],
+        ["upload", "download"],
+        ["filename", "path", "resolve"]
+      ]
+    },
+    {
+      "id": "TOKEN-001",
+      "title": "Third-party API tokens are stored and exposed in plaintext",
+      "priority": "P1-P2",
+      "groups": [
+        ["third-party", "api_tokens", "provider token"],
+        ["plaintext", "cleartext", "unencrypted"],
+        ["tokenValue", "token_value", "sk_live"]
+      ]
+    },
+    {
+      "id": "LOG-001",
+      "title": "Credentials and issued tokens are logged",
+      "priority": "P2",
+      "groups": [
+        ["log", "logging"],
+        ["password", "token", "credential"],
+        ["AuditLogService"]
+      ]
+    },
+    {
+      "id": "DEPLOY-001",
+      "title": "Docker and Compose run with secrets, root, privileged mode, or Docker socket mount",
+      "priority": "P2",
+      "groups": [
+        ["Docker", "Compose", "container"],
+        ["root", "privileged", "docker.sock"],
+        ["secret", "token", "password", "environment"]
+      ]
+    },
+    {
+      "id": "DEPLOY-002",
+      "title": "Kubernetes manifest uses privileged root workload, host access, inline secrets, and no limits",
+      "priority": "P1-P2",
+      "groups": [
+        ["Kubernetes", "Deployment"],
+        ["privileged", "hostNetwork", "hostPath", "NodePort"],
+        ["inline secret", "environment", "resource limits", "runAsUser"]
+      ]
+    },
+    {
+      "id": "DEPLOY-003",
+      "title": "Nginx exposes sensitive app routes over HTTP",
+      "priority": "P2",
+      "groups": [
+        ["nginx", "reverse proxy", "proxy"],
+        ["HTTP", "TLS", "plaintext"],
+        ["actuator", "h2-console"]
+      ]
+    },
+    {
+      "id": "SUPPLY-001",
+      "title": "CI uses non-deterministic dependency resolution and lacks SCA scanning",
+      "priority": "P2-P3",
+      "groups": [
+        ["SCA", "dependency", "supply chain"],
+        ["missing", "lacks", "not configured", "dependency-check"],
+        ["mvn -B -U", "GitHub Actions", "CI", "unpinned actions"]
+      ]
+    }
+  ]
+}
