@@ -1,0 +1,18 @@
+{
+  "required_report_terms": [
+    "auth-service",
+    "payment-service"
+  ],
+  "required_related_entries": [
+    "auth-service",
+    "payment-service"
+  ],
+  "required_register_entries": [
+    "auth-service",
+    "payment-service"
+  ],
+  "required_register_interfaces": {
+    "auth-service": "POST /internal/auth/verify",
+    "payment-service": "POST /internal/payments/charge"
+  }
+}
