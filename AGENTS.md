@@ -5,15 +5,21 @@ Guidance for AI agents working in `appsec-advisor-fixtures`.
 ## What this repo is
 
 Test fixtures for the sibling [`appsec-advisor`](../appsec-advisor) plugin. It
-holds scan-target repos, producer threat-model exports, and an external oracle.
-It is **not** an application — there is nothing to build or deploy here. Read
-`README.md` first.
+holds scan-target repos (as git submodules), producer threat-model exports, and
+external oracles. It is **not** an application — there is nothing to build or
+deploy here. Read `README.md` first.
+
+The fixture repos under `repos/` are separate GitHub repositories pinned as
+submodules. If they appear empty, run `git submodule update --init --recursive`
+before doing any work.
 
 ## Golden rules
 
 1. **Determinism over realism.** Fixtures are synthetic and minimal. Do not add
    dependencies, real logic, or "more realistic" code unless a test in
    `appsec-advisor` requires it. More code = more drift = flakier E2E.
+   Submodule pointers in this repo are pinned commits — do not run
+   `git submodule update --remote` without intent; it advances the pin.
 2. **The oracle is a contract.** `oracles/cross-repo-threat-fixture/expected-signals.json`
    and `verify_threat_model.py` define what a passing run looks like. If you
    change a fixture's interface, component name, or boundary, update the oracle
@@ -47,10 +53,16 @@ and `payment-service` (`required_report_terms`).
 
 ## Common tasks
 
-- **Add a producer service:** create `repos/<fixture>/<svc>/` with
-  `package.json`, `src/`, and `docs/security/threat-model.yaml`; add it to the
-  consumer's `related-repos.yaml`; add its name + interface to
-  `expected-signals.json`. Then run the plugin-side E2E to confirm.
+- **First checkout:** after cloning this repo run
+  `git submodule update --init --recursive` to populate `repos/`.
+- **Update a fixture to a newer commit:** run
+  `git submodule update --remote repos/<fixture>`, then commit the updated
+  submodule pointer in this repo.
+- **Add a producer service:** create the service repo on GitHub, register it as
+  a submodule under `repos/cross-repo-threat-fixture/<svc>/`, add a
+  `docs/security/threat-model.yaml` export, update the consumer's
+  `related-repos.yaml`, and add the name + interface to `expected-signals.json`.
+  Then run the plugin-side E2E to confirm.
 - **Tighten/loosen what the oracle checks:** edit `expected-signals.json`
   (declarative) before touching `verify_threat_model.py` (logic).
 - **Inspect a failed run:** the driver passes `--keep-runtime-files`, so
