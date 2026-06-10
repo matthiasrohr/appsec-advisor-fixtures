@@ -1,0 +1,115 @@
+{
+  "fixture": "aws-terraform-threat-fixture",
+  "signals": [
+    {
+      "id": "AWS-TF-API-001",
+      "title": "Public API Gateway invokes Lambda without authorization or API keys",
+      "category": "design",
+      "priority": "P1-P2",
+      "fixture_evidence": [
+        "main.tf declares aws_api_gateway_method.any_proxy with authorization = NONE",
+        "main.tf declares api_key_required = false",
+        "main.tf integrates the public API Gateway resource with Lambda"
+      ],
+      "groups": [
+        ["API Gateway", "api_gateway", "REST API"],
+        ["Lambda", "AWS_PROXY", "lambda_proxy"],
+        ["authorization", "NONE", "no authorizer", "unauthenticated"],
+        ["api_key_required", "API key", "public", "internet"]
+      ]
+    },
+    {
+      "id": "AWS-TF-IAM-001",
+      "title": "Lambda execution role grants wildcard account access",
+      "priority": "P1",
+      "groups": [
+        ["IAM", "role", "policy"],
+        ["wildcard", "all resources", "Resource", "least privilege"],
+        ["iam:PassRole", "s3:*", "dynamodb:*", "sqs:*", "logs:*", "kms:Decrypt"]
+      ]
+    },
+    {
+      "id": "AWS-TF-SECRETS-001",
+      "title": "Terraform variables, Lambda environment, CI, outputs, and Parameter Store expose plaintext secrets",
+      "priority": "P1-P2",
+      "groups": [
+        ["secret", "token", "password", "credential"],
+        ["plaintext", "hardcoded", "Terraform state", "output", "environment", "String"],
+        ["ADMIN_BYPASS_TOKEN", "STRIPE_WEBHOOK_SECRET", "database_password", "AWS_SECRET_ACCESS_KEY", "partner_api_token"]
+      ]
+    },
+    {
+      "id": "AWS-TF-S3-001",
+      "title": "S3 buckets allow public object access and website exposure without protective controls",
+      "priority": "P1-P2",
+      "groups": [
+        ["S3", "bucket"],
+        ["public", "public-read", "Principal", "anonymous", "website"],
+        ["s3:GetObject", "s3:PutObject", "public access block"],
+        ["versioning", "encryption", "Suspended", "unencrypted", "public_reports"]
+      ]
+    },
+    {
+      "id": "AWS-TF-BEDROCK-001",
+      "title": "Bedrock agent invokes a foundation model without guardrails",
+      "priority": "P1-P2",
+      "groups": [
+        ["Bedrock", "bedrock", "foundation model"],
+        ["guardrail", "guardrails", "guardrail_configuration", "without guardrails"],
+        ["InvokeModel", "InvokeModelWithResponseStream", "aws_bedrockagent_agent"],
+        ["raw customer context", "operator actions", "wallet_assistant"]
+      ]
+    },
+    {
+      "id": "AWS-TF-SSM-001",
+      "title": "Parameter Store stores an API token as an unencrypted plaintext String",
+      "priority": "P1-P2",
+      "groups": [
+        ["SSM", "Parameter Store", "aws_ssm_parameter"],
+        ["String", "SecureString", "unencrypted", "plaintext"],
+        ["partner API token", "partner_api_token", "sk_live_parameterstore_plaintext_fixture"]
+      ]
+    },
+    {
+      "id": "AWS-TF-DATA-001",
+      "title": "RDS, DynamoDB, and SQS data services lack encryption, backup, PITR, or dead-letter controls",
+      "priority": "P1-P2",
+      "groups": [
+        ["RDS", "DynamoDB", "SQS"],
+        ["publicly_accessible", "public", "internet", "0.0.0.0/0"],
+        ["storage_encrypted", "server_side_encryption", "unencrypted"],
+        ["point_in_time_recovery", "backup_retention", "dead-letter", "DLQ"]
+      ]
+    },
+    {
+      "id": "AWS-TF-NET-001",
+      "title": "Wide-open security group exposes Lambda and database network paths",
+      "priority": "P1",
+      "groups": [
+        ["security group", "network", "VPC"],
+        ["0.0.0.0/0", "public subnet", "public_subnet_ids", "ingress"],
+        ["Lambda", "RDS", "database", "egress"]
+      ]
+    },
+    {
+      "id": "AWS-TF-LOG-001",
+      "title": "API Gateway and Lambda observability omit access logs, retention, and tracing",
+      "priority": "P2-P3",
+      "groups": [
+        ["CloudWatch", "logs", "logging"],
+        ["retention", "never expire", "missing", "not configured"],
+        ["API Gateway", "access logs", "X-Ray", "tracing", "PassThrough"]
+      ]
+    },
+    {
+      "id": "AWS-TF-CI-001",
+      "title": "CI applies Terraform automatically with dynamic upgrades and no IaC security scan",
+      "priority": "P2",
+      "groups": [
+        ["Terraform", "CI", "GitHub Actions"],
+        ["terraform init -upgrade", "terraform apply -auto-approve"],
+        ["tfsec", "Checkov", "IaC scan", "missing", "not configured"]
+      ]
+    }
+  ]
+}

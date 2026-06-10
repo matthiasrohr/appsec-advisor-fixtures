@@ -217,6 +217,17 @@
       ]
     },
     {
+      "id": "DEPLOY-004",
+      "title": "Terraform OpenShift deployment grants cluster-admin, stores inline secrets, and exposes insecure routes",
+      "priority": "P1-P2",
+      "groups": [
+        ["Terraform", "OpenShift"],
+        ["cluster-admin", "SecurityContextConstraints", "privileged"],
+        ["secret", "kubernetes_secret", "APP_ADMIN_BOOTSTRAP_TOKEN", "APP_JWT_SIGNING_KEY", "Terraform state"],
+        ["Route", "insecureEdgeTerminationPolicy", "plaintext", "Allow", "HTTP"]
+      ]
+    },
+    {
       "id": "SUPPLY-001",
       "title": "CI uses non-deterministic dependency resolution and lacks SCA scanning",
       "priority": "P2-P3",

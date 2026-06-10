@@ -25,6 +25,7 @@ repos/
   go-threat-fixture/           # scan target — net/http OAuth/API fixture
   node-typescript-threat-fixture/  # scan target — Express/TypeScript fixture
   python-langchain-llm-threat-fixture/  # scan target — FastAPI/LangChain fixture
+  aws-terraform-threat-fixture/  # scan target — AWS Terraform infrastructure fixture
 oracles/
   cross-repo-threat-fixture/
     verify_threat_model.py    # external oracle — asserts cross-repo signals
@@ -37,6 +38,7 @@ oracles/
   go-threat-fixture/
   node-typescript-threat-fixture/
   python-langchain-llm-threat-fixture/
+  aws-terraform-threat-fixture/
 outputs/
   cross-repo-threat-fixture-e2e/   # generated artifacts land here (gitkept, empty)
   spring-boot-threat-fixture-e2e/  # generated artifacts land here (gitkept, empty)
@@ -45,6 +47,7 @@ outputs/
   go-threat-fixture-e2e/
   node-typescript-threat-fixture-e2e/
   python-langchain-llm-threat-fixture-e2e/
+  aws-terraform-threat-fixture-e2e/
 ```
 
 ## The `cross-repo-threat-fixture`
@@ -93,8 +96,8 @@ Seeded design and implementation signals include:
 - wildcard credentialed CORS, disabled CSRF, and public `permitAll` API routes,
 - public actuator/H2/internal diagnostic endpoints,
 - plaintext credentials/tokens, IDOR, SQL injection, NoSQL injection, SSRF,
-  unsigned webhooks, file traversal, weak deployment manifests, and missing SCA
-  automation.
+  unsigned webhooks, file traversal, weak Kubernetes/OpenShift/Terraform
+  deployment manifests, and missing SCA automation.
 
 The source repo is `repos/spring-boot-threat-fixture`. Its oracle lives in
 `oracles/spring-boot-threat-fixture` and checks report evidence terms from
@@ -137,6 +140,28 @@ through retrieved context, caller-controlled tools, SSRF via HTTP fetch tools,
 Python code execution, local file reads, prompt/trace secret leakage, and
 cross-tenant memory access.
 
+## The `aws-terraform-threat-fixture`
+
+A Terraform-only AWS infrastructure fixture for single-repo threat-model checks.
+It contains no runnable application code; the scan target is the IaC surface.
+
+Seeded AWS signals include:
+
+- public API Gateway to Lambda without authorizers or API keys,
+- Amazon Bedrock model invocation without guardrails,
+- Lambda environment variables and Terraform outputs containing plaintext
+  tokens, passwords, and webhook secrets,
+- SSM Parameter Store `String` values storing plaintext secrets,
+- wildcard IAM permissions including `iam:PassRole` and account-wide service
+  access,
+- public S3 object access, disabled public-access blocks, and suspended
+  versioning,
+- public unencrypted RDS, DynamoDB without PITR, SQS without a dead-letter queue,
+- wide-open security groups and public subnet placement,
+- missing API Gateway/Lambda access logging, retention, and tracing controls,
+- GitHub Actions running `terraform init -upgrade` and
+  `terraform apply -auto-approve` without IaC scanning.
+
 Run them with `scripts/e2e_fixture.sh` from the plugin repo by passing
 `--fixture <name>`. The driver scans only `repos/<fixture>`, writes to
 `outputs/<fixture>-e2e`, and then runs the matching external oracle.
@@ -150,6 +175,7 @@ cd ../appsec-advisor
 ./scripts/e2e_cross_repo_fixture.sh --depth quick --clean-output
 ./scripts/e2e_fixture.sh --fixture spring-boot-threat-fixture --depth quick --clean-output
 ./scripts/e2e_fixture.sh --fixture python-langchain-llm-threat-fixture --depth quick --clean-output
+./scripts/e2e_fixture.sh --fixture aws-terraform-threat-fixture --depth quick --clean-output
 ```
 
 The drivers default to this sibling checkout (`../appsec-advisor-fixtures`).
@@ -169,7 +195,7 @@ Spring-specific compatibility wrapper.
 - Fixture source is **synthetic and intentionally minimal** — just enough code
   for the boundary to be real. Cross-repo producer threats are pre-seeded in
   YAML exports; single-repo threats are inferred from code, configuration, and
-  deployment files.
+  deployment or infrastructure files.
 - Scan targets under `repos/` are standalone fixture repos so the plugin's
   `--repo` resolution stays inside the intended scan target.
 - Threat-model exports use a far-future `meta.generated` timestamp

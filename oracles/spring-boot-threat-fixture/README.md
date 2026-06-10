@@ -31,5 +31,7 @@ Design signals are part of the oracle contract:
   sensitive operational state.
 - `NOSQL-001`: document search accepts raw MongoDB-style filters and `$where`
   clauses.
+- `DEPLOY-004`: Terraform-managed OpenShift metadata grants elevated cluster
+  access, stores secrets in state, and exposes an insecure route.
 - `SUPPLY-001`: CI uses non-deterministic Maven update resolution and lacks
   dependency SCA.
