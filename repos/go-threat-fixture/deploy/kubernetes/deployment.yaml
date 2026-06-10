@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-threat-fixture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-threat-fixture
+  template:
+    metadata:
+      labels:
+        app: go-threat-fixture
+    spec:
+      hostNetwork: true
+      containers:
+        - name: app
+          image: go-threat-fixture:latest
+          env:
+            - name: ADMIN_BOOTSTRAP_TOKEN
+              value: go-admin-demo-token
+            - name: JWT_SIGNING_KEY
+              value: go-fixture-jwt-key-too-short
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+            runAsUser: 0
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+

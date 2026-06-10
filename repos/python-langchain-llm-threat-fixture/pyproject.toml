@@ -1,0 +1,14 @@
+[project]
+name = "python-langchain-llm-threat-fixture"
+version = "0.1.0"
+description = "Intentionally vulnerable LangChain fixture for AppSec Advisor testing"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "langchain",
+  "langchain-openai",
+  "langchain-community",
+  "requests"
+]
+

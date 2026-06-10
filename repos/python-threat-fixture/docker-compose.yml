@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  python-threat-fixture:
+    build: .
+    privileged: true
+    ports:
+      - "8000:8000"
+    environment:
+      ADMIN_BOOTSTRAP_TOKEN: py-admin-demo-token
+      JWT_SIGNING_KEY: python-fixture-jwt-key-too-short
+      PAYMENT_WEBHOOK_SECRET: inline-compose-secret
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./runtime/uploads:/app/runtime/uploads
+

@@ -1,0 +1,6 @@
+bin/
+.appsec-cache/
+runtime/
+docs/security/
+*.log
+

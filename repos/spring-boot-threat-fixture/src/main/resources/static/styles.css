@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+}
+
+.shell {
+    max-width: 920px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.panel {
+    background: #ffffff;
+    border: 1px solid #d7dde8;
+    border-radius: 6px;
+    padding: 24px;
+}
+
+.muted {
+    color: #5d6b82;
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+button {
+    border: 1px solid #65738a;
+    background: #23395d;
+    color: #ffffff;
+    border-radius: 4px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+pre {
+    min-height: 260px;
+    overflow: auto;
+    background: #111827;
+    color: #d9f99d;
+    padding: 16px;
+    border-radius: 4px;
+}
+

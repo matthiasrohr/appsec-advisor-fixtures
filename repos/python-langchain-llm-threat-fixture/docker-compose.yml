@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  python-langchain-llm-threat-fixture:
+    build: .
+    privileged: true
+    ports:
+      - "8010:8010"
+    environment:
+      OPENAI_API_KEY: sk-live-langchain-fixture-inline
+      ADMIN_BOOTSTRAP_TOKEN: llm-admin-demo-token
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./runtime:/app/runtime
+

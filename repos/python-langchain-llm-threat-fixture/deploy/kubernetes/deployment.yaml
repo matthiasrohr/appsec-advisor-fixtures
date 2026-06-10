@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-langchain-llm-threat-fixture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-langchain-llm-threat-fixture
+  template:
+    metadata:
+      labels:
+        app: python-langchain-llm-threat-fixture
+    spec:
+      hostNetwork: true
+      containers:
+        - name: app
+          image: python-langchain-llm-threat-fixture:latest
+          env:
+            - name: OPENAI_API_KEY
+              value: sk-live-langchain-fixture-inline
+            - name: ADMIN_BOOTSTRAP_TOKEN
+              value: llm-admin-demo-token
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+            runAsUser: 0

@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  node-typescript-threat-fixture:
+    build: .
+    privileged: true
+    ports:
+      - "3000:3000"
+    environment:
+      ADMIN_BOOTSTRAP_TOKEN: node-admin-demo-token
+      JWT_SIGNING_KEY: node-fixture-jwt-key-too-short
+      PAYMENT_WEBHOOK_SECRET: inline-compose-secret
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./runtime/uploads:/app/runtime/uploads
+

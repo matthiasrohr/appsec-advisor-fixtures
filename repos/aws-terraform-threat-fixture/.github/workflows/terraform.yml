@@ -1,0 +1,22 @@
+name: terraform
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: AKIAFIXTUREACCESSKEY
+      AWS_SECRET_ACCESS_KEY: fixture-secret-access-key-please-change
+      TF_VAR_database_password: WalletFixturePassword123!
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Terraform init
+        run: terraform init -upgrade
+      - name: Terraform plan
+        run: terraform plan -out=tfplan
+      - name: Terraform apply
+        run: terraform apply -auto-approve tfplan

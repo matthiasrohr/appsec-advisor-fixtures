@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  rust-threat-fixture:
+    build: .
+    privileged: true
+    ports:
+      - "8081:8081"
+    environment:
+      ADMIN_BOOTSTRAP_TOKEN: rust-admin-demo-token
+      JWT_SIGNING_KEY: rust-fixture-jwt-key-too-short
+      PAYMENT_WEBHOOK_SECRET: inline-compose-secret
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./runtime/uploads:/app/runtime/uploads
+

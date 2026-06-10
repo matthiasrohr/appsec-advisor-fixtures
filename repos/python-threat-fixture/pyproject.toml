@@ -1,0 +1,14 @@
+[project]
+name = "python-threat-fixture"
+version = "0.1.0"
+description = "Intentionally vulnerable FastAPI fixture for AppSec Advisor testing"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "python-multipart"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

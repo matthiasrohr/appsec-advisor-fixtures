@@ -1,0 +1,10 @@
+target/
+runtime/
+logs/
+.appsec-cache/
+docs/security/
+.idea/
+.vscode/
+*.iml
+*.log
+

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallet-threat-fixture
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wallet-threat-fixture
+  template:
+    metadata:
+      labels:
+        app: wallet-threat-fixture
+    spec:
+      hostNetwork: true
+      containers:
+        - name: app
+          image: wallet-threat-fixture:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ADMIN_BOOTSTRAP_TOKEN
+              value: adm1n-demo-token-please-change
+            - name: APP_JWT_SIGNING_KEY
+              value: fixture-jwt-signing-key-too-short
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: production-password-inline
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+            runAsUser: 0
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+            - name: uploads
+              mountPath: /app/runtime/uploads
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: uploads
+          hostPath:
+            path: /tmp/wallet-threat-fixture/uploads
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wallet-threat-fixture
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: wallet-threat-fixture
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30080
+

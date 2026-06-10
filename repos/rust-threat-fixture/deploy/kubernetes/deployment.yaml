@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rust-threat-fixture
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rust-threat-fixture
+  template:
+    metadata:
+      labels:
+        app: rust-threat-fixture
+    spec:
+      hostNetwork: true
+      containers:
+        - name: app
+          image: rust-threat-fixture:latest
+          env:
+            - name: ADMIN_BOOTSTRAP_TOKEN
+              value: rust-admin-demo-token
+            - name: JWT_SIGNING_KEY
+              value: rust-fixture-jwt-key-too-short
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+            runAsUser: 0
+          volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run/docker.sock
+      volumes:
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+
