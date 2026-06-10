@@ -11,35 +11,6 @@ its own test data.
   appsec-advisor-fixtures/   # this repo
 ```
 
-## Repo structure: submodules
-
-The fixture scan targets under `repos/` are **separate GitHub repositories**
-registered as git submodules of this repo. After cloning `appsec-advisor-fixtures`
-you must initialise them:
-
-```bash
-git submodule update --init --recursive
-```
-
-Each submodule maps to a fixture name:
-
-| Submodule path | GitHub repo |
-|---|---|
-| `repos/spring-boot-threat-fixture` | `matthiasrohr/spring-boot-threat-fixture` |
-| `repos/python-threat-fixture` | `matthiasrohr/python-threat-fixture` |
-| `repos/rust-threat-fixture` | `matthiasrohr/rust-threat-fixture` |
-| `repos/go-threat-fixture` | `matthiasrohr/go-threat-fixture` |
-| `repos/node-typescript-threat-fixture` | `matthiasrohr/node-typescript-threat-fixture` |
-| `repos/python-langchain-llm-threat-fixture` | `matthiasrohr/python-langchain-llm-threat-fixture` |
-| `repos/aws-terraform-threat-fixture` | `matthiasrohr/aws-terraform-threat-fixture` |
-| `repos/cross-repo-threat-fixture/consumer-api` | `matthiasrohr/consumer-api` |
-| `repos/cross-repo-threat-fixture/auth-service` | `matthiasrohr/auth-service` |
-| `repos/cross-repo-threat-fixture/payment-service` | `matthiasrohr/payment-service` |
-
-The submodules are pinned to specific commits so E2E runs are reproducible.
-Update a pin with `git submodule update --remote repos/<fixture>` followed by
-committing the new commit pointer here.
-
 ## Layout
 
 ```text
@@ -225,8 +196,9 @@ Spring-specific compatibility wrapper.
   for the boundary to be real. Cross-repo producer threats are pre-seeded in
   YAML exports; single-repo threats are inferred from code, configuration, and
   deployment or infrastructure files.
-- Scan targets under `repos/` are standalone fixture repos so the plugin's
-  `--repo` resolution stays inside the intended scan target.
+- Scan targets under `repos/` are plain directories in this repo. The plugin's
+  `--repo` flag is pointed at the relevant subdirectory so the scanner stays
+  inside the intended scan target.
 - Threat-model exports use a far-future `meta.generated` timestamp
   (`2099-01-01`) and stable `commit_sha` values so runs are deterministic.
 - `outputs/` is generated; do not commit run artifacts. The driver writes only
